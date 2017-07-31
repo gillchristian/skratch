@@ -38,7 +38,7 @@ self.addEventListener('fetch', (event) => {
       .match(event.request)
       .then((cached) => {
         const networked = fetch(event.request)
-          .then(fetchedFromNetwork(caches))
+          .then(fetchedFromNetwork(caches, event))
           .catch(unableToResolve)
 
         console.log(`WORKER: fetch event: ${cached ? '(cached)' : '(network)'} ${event.request.url}`)
@@ -66,7 +66,8 @@ self.addEventListener('activate', (event) => {
 })
 
 // ----- HELPERS -----
-function unableToResolve () {
+function unableToResolve (e) {
+  console.log(e)
   console.log('WORKER: fetch request failed in both cache and network.')
 
   return new Response('<h1>Service Unavailable</h1>', {
@@ -78,7 +79,7 @@ function unableToResolve () {
   })
 }
 
-function fetchedFromNetwork(caches) {
+function fetchedFromNetwork(caches, event) {
   return (response) => {
     const cacheCopy = response.clone()
 
@@ -89,6 +90,9 @@ function fetchedFromNetwork(caches) {
       .then((cache) => cache.put(event.request, cacheCopy))
       .then(() => {
         console.log(`WORKER: fetch response stored in cache: ${event.request.url}`)
+      })
+      .catch(() => {
+        console.log(`WORKER: storing in cache failed for: ${event.request.url}`)
       })
 
     return response
