@@ -1,7 +1,11 @@
 const box = document.getElementById('text')
 const saved = document.getElementById('saved')
+const loading = document.getElementById('loading')
 
-// ON LOAD
+// ----- ON LOAD -----
+
+loading.classList.add('hidden')
+
 box.value = localStorage.getItem('scratch-content')
 box.focus()
 

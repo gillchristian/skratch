@@ -1,0 +1,56 @@
+* {
+  font-family: monospace;
+  color: white;
+  box-sizing: border-box;
+}
+
+body, html, div {
+  margin: 0;
+  padding: 0;
+}
+
+.hidden {
+  display: none;
+}
+
+textarea {
+  width: 100%;
+  height: 100vh;
+  margin: 0;
+  padding: 20px;
+  border: none;
+  background-color: #356C5D;
+}
+
+textarea:focus {
+  outline: none;
+}
+
+#saved {
+  color: black;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  padding: 5px;
+  background-color: rgba(0,0,0,0.15);
+}
+
+#loading {
+  width: 100%;
+  height: 100vh;
+  background-color: rgba(0,0,0,0.25);
+
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 2;
+}
+
+#loading > div {
+  width: 100%;
+  height: 100vh;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

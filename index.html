@@ -6,48 +6,21 @@
   <title>scratch</title>
   <base href="/scratch/"></base>
 
-  <style>
-    * {
-      font-family: monospace;
-      color: white;
-      box-sizing: border-box;
-    }
-
-    body, html, div {
-      margin: 0;
-      padding: 0;
-    }
-
-    textarea {
-      width: 100%;
-      height: 100vh;
-      margin: 0;
-      padding: 20px;
-      border: none;
-      background-color: #356C5D;
-    }
-
-    #saved {
-      color: black;
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      padding: 5px;
-      background-color: rgba(0,0,0,0.15);
-    }
-
-    .hidden {
-      display: none;
-    }
-  </style>
+  <!-- styles --> 
+  <link rel="stylesheet" href="index.css">
 </head>
 <body>
 
   <div id="app">
     <div id="saved" class="hidden">saved!</div>
     <textarea id="text"></textarea>
+    <div id="loading">
+      <div>loading...</div>
+    </div>
   </div>
 
+  <!-- scripts -->
   <script src="index.js"></script>
+
 </body>
 </html>
