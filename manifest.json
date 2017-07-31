@@ -1,0 +1,17 @@
+{
+  "name": "scratch",
+  "short_name": "scratch",
+  "lang": "en",
+  "description": "minimalist notes taking app",
+  "start_url": "./",
+  "display": "standalone",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "16x16",
+      "type": "image/png"
+    }
+  ],
+  "background_color": "#356C5D",
+  "theme_color": "#356C5D"
+}
