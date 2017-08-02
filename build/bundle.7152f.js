@@ -3624,7 +3624,7 @@
         "undefined" != typeof window && localStorage.setItem(e, t);
       },
       getItem: function(e) {
-        "undefined" != typeof window && localStorage.getItem(e);
+        if ("undefined" != typeof window) return localStorage.getItem(e);
       }
     };
   },
@@ -3700,4 +3700,4 @@
     var n = Object.prototype.toString;
   }
 });
-//# sourceMappingURL=bundle.a1234.js.map
+//# sourceMappingURL=bundle.7152f.js.map
