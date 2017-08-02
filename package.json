@@ -1,0 +1,49 @@
+{
+  "name": "skratch",
+  "version": "0.0.1",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "if-env NODE_ENV=production && yarn run -s serve || yarn run -s dev",
+    "build": "preact build && cp Caddyfile build",
+    "serve": "preact build && preact serve",
+    "dev": "preact watch",
+    "test": "eslint src && preact test",
+    "format": "prettier --single-quote --trailing-comma all --no-semi --write \"src/**/*.js\"",
+    "precommit": "lint-staged"
+  },
+  "devDependencies": {
+    "eslint": "^4.3.0",
+    "eslint-config-prettier": "^2.3.0",
+    "eslint-config-synacor": "^1.0.1",
+    "eslint-plugin-prettier": "^2.1.2",
+    "husky": "^0.14.3",
+    "if-env": "^1.0.0",
+    "lint-staged": "^4.0.2",
+    "preact-cli": "^1.4.1",
+    "prettier": "^1.5.3"
+  },
+  "dependencies": {
+    "preact": "^8.2.1",
+    "preact-compat": "^3.16.0",
+    "styled-components": "^2.1.1"
+  },
+  "eslintConfig": {
+    "extends": [
+      "eslint-config-synacor",
+      "prettier"
+    ],
+    "plugins": [
+      "prettier"
+    ],
+    "rules": {
+      "react/jsx-wrap-multilines": 0
+    }
+  },
+  "lint-staged": {
+    "*.js": [
+      "prettier --write",
+      "git add"
+    ]
+  }
+}
