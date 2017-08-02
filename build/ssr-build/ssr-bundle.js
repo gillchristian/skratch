@@ -6351,7 +6351,7 @@ module.exports = /******/ (function(modules) {
         },
         getItem: function getItem(key) {
           if (typeof window !== "undefined") {
-            localStorage.getItem(key);
+            return localStorage.getItem(key);
           }
         }
       };

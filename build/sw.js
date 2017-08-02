@@ -73,9 +73,9 @@ var precacheConfig = [
     ["/assets/icons/ms-icon-150x150.png", "5d6c271d6291f900848ab86261bfd338"],
     ["/assets/icons/ms-icon-310x310.png", "4e8dedf1956d6ec1d757ac501b40c464"],
     ["/assets/icons/ms-icon-70x70.png", "8f2f3d08cbe393cd6984f8814e02039f"],
-    ["/bundle.a1234.js", "e8eb9123a6213bd0482a342a96313290"],
+    ["/bundle.7152f.js", "43362116c60a4b4b307b731e4f94601f"],
     ["/favicon.ico", "8244b1aadb73b999c6987ac42039e8a8"],
-    ["/index.html", "e3fa20cd6264a27a39420a0e3947e7dd"],
+    ["/index.html", "2ae4c840e9e667856cfe3f744dd96040"],
     ["/manifest.json", "fb4961f51644a4953845c9c452563fc8"],
     ["/style.72972.css", "f7f9ab98594d1e5e7b585b26ddb0b4db"]
   ],
@@ -99,13 +99,13 @@ var precacheConfig = [
       : Promise.resolve(e);
   },
   createCacheKey = function(e, n, a, s) {
-    var t = new URL(e);
-    return (s && t.pathname.match(s)) ||
-      (t.search +=
-        (t.search ? "&" : "") +
+    var c = new URL(e);
+    return (s && c.pathname.match(s)) ||
+      (c.search +=
+        (c.search ? "&" : "") +
         encodeURIComponent(n) +
         "=" +
-        encodeURIComponent(a)), t.toString();
+        encodeURIComponent(a)), c.toString();
   },
   isPathWhitelisted = function(e, n) {
     if (0 === e.length) return !0;
@@ -138,8 +138,8 @@ var precacheConfig = [
       var n = e[0],
         a = e[1],
         s = new URL(n, self.location),
-        t = createCacheKey(s, hashParamName, a, !1);
-      return [s.toString(), t];
+        c = createCacheKey(s, hashParamName, a, !1);
+      return [s.toString(), c];
     })
   );
 self.addEventListener("install", function(e) {
