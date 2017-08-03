@@ -1,0 +1,3 @@
+# scratch
+
+> minimalistic notes app
