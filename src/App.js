@@ -1,10 +1,10 @@
-import React from "react";
+import React from 'react'
 
-import Editor from "./components/editor";
+import Editor from './components/editor'
 
 const App = () =>
   <div>
     <Editor />
-  </div>;
+  </div>
 
-export default App;
+export default App

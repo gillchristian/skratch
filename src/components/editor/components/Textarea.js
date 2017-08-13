@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components'
 
 const Textarea = styled.div`
   width: 100%;
@@ -12,6 +12,6 @@ const Textarea = styled.div`
   &:focus {
     outline: none;
   }
-`;
+`
 
-export default Textarea;
+export default Textarea

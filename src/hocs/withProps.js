@@ -1,13 +1,13 @@
-import React from "react";
+import React from 'react'
 
 const withProps = (p = {}) => Component => ({ children, ...rest }) => {
-  const props = typeof p === "function" ? p({ children, ...rest }) : p;
+  const props = typeof p === 'function' ? p({ children, ...rest }) : p
 
   return (
     <Component {...props} {...rest}>
       {children}
     </Component>
-  );
-};
+  )
+}
 
-export default withProps;
+export default withProps

@@ -15,12 +15,13 @@
     "build": "react-scripts build && cp Caddyfile build/Caddyfile",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
-    "format": "prettier --single-quote --trailing-comma all --no-semi --write \"src/**/*.js\"",
+    "format": "npm run prettier -- --write \"src/**/*.js\"",
+    "prettier": "prettier --single-quote --trailing-comma all --no-semi",
     "precommit": "lint-staged"
   },
   "lint-staged": {
     "src/**/*.js": [
-      "prettier --write",
+      "npm run prettier -- --write",
       "git add"
     ]
   },

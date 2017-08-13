@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components'
 
 const Link = styled.a`
   color: inherit;
@@ -10,6 +10,6 @@ const Link = styled.a`
   &:visite {
     color: inherit;
   }
-`;
+`
 
-export default Link;
+export default Link
