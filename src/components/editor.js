@@ -92,7 +92,8 @@ class EditorWrapper extends React.Component {
       }
     ]);
 
-    const raw = JSON.parse(storage.getItem("scratch-content"));
+    const stored = storage.getItem("scratch-content");
+    const raw = stored && JSON.parse(stored);
     const editorState = raw
       ? EditorState.createWithContent(convertFromRaw(raw), decorator)
       : EditorState.createEmpty(decorator);
@@ -123,6 +124,7 @@ class EditorWrapper extends React.Component {
     this.persistContent();
   };
 
+  // saves the content to localStorage everytime the user stops typing for 500ms
   persistContent = () => {
     clearTimeout(this.timer);
 
@@ -136,7 +138,7 @@ class EditorWrapper extends React.Component {
       setTimeout(() => {
         this.setState({ showBadge: false });
       }, 1500);
-    }, 1500);
+    }, 500);
 
     this.timer = timer;
   };
