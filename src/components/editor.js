@@ -1,7 +1,17 @@
-import { h, Component } from 'preact'
-import styled from 'styled-components'
+import React from "react";
+import styled from "styled-components";
 
-import storage from '../services/storage'
+import {
+  Editor,
+  EditorState,
+  RichUtils,
+  CompositeDecorator,
+  convertToRaw,
+  convertFromRaw
+} from "draft-js";
+
+import storage from "../services/storage";
+import withProps from "../hocs/withProps";
 
 const Badge = styled.span`
   color: black;
@@ -10,9 +20,9 @@ const Badge = styled.span`
   left: 0;
   padding: 5px;
   background-color: rgba(0, 0, 0, 0.15);
-`
+`;
 
-const Textarea = styled.textarea`
+const Textarea = styled.div`
   width: 100%;
   height: 100vh;
   margin: 0;
@@ -24,53 +34,147 @@ const Textarea = styled.textarea`
   &:focus {
     outline: none;
   }
-`
+`;
 
-export default class Editor extends Component {
-  state = {
-    value: storage.getItem('scratch-content') || '',
-    showBadge: false,
-    isWritting: false,
+const EditorLink = styled.a.attrs({
+  // children gets passed an array of React components
+  // with one component containing the text
+  // which is the href of the link
+  href: p => p.children[0].props.text
+})`
+  color: inherit;
+  cursor: pointer;
+
+  &:hover,
+  &:link,
+  &:active,
+  &:visite {
+    color: inherit;
   }
+`;
 
-  handleInput = e => {
-    this.setState({ value: e.target.value, isWritting: true })
+// TODO: make this method more functional
+function findWithRegex(regex, contentBlock, callback) {
+  const text = contentBlock.getText();
+  let matchArr = regex.exec(text);
+  let start;
 
-    this.persistContent()
+  while (matchArr !== null) {
+    start = matchArr.index;
+    callback(start, start + matchArr[0].length);
+
+    matchArr = regex.exec(text);
   }
+}
 
-  persistContent = () => {
-    clearTimeout(this.timer)
+// TODO: improve the link matching
+const rgx = /https?:\/\/\S+/g;
 
-    const timer = setTimeout(() => {
-      this.setState({ isWritting: false, showBadge: true })
+function findLinkEntities(contentBlock, callback, contentState) {
+  findWithRegex(rgx, contentBlock, callback);
+}
 
-      storage.setItem('scratch-content', this.state.value)
+class EditorWrapper extends React.Component {
+  constructor(props) {
+    super(props);
 
-      setTimeout(() => {
-        this.setState({ showBadge: false })
-      }, 1500)
-    }, 1500)
+    this.disableEdit = this.disableEdit.bind(this);
+    this.enableEdit = this.enableEdit.bind(this);
 
-    this.timer = timer
-  }
+    const decorator = new CompositeDecorator([
+      {
+        strategy: findLinkEntities,
+        component: withProps({
+          onMouseEnter: this.disableEdit,
+          onMouseLeave: this.enableEdit,
+          target: "_blank"
+        })(EditorLink)
+      }
+    ]);
 
-  bindTextarea = x => {
-    this.textarea = x
+    const raw = JSON.parse(storage.getItem("scratch-content"));
+    const editorState = raw
+      ? EditorState.createWithContent(convertFromRaw(raw), decorator)
+      : EditorState.createEmpty(decorator);
+
+    this.state = {
+      editorState,
+      isOverALink: false,
+      isWritting: false,
+      showBadge: false
+    };
   }
 
   componentDidMount() {
-    this.textarea.focus()
+    this.editor.focus();
   }
 
-  render(_, { value, showBadge }) {
+  disableEdit() {
+    this.setState({ isOverALink: true });
+  }
+
+  enableEdit() {
+    this.setState({ isOverALink: false });
+    setTimeout(() => this.editor.focus(), 0);
+  }
+
+  onChange = editorState => {
+    this.setState({ editorState, isWritting: true });
+    this.persistContent();
+  };
+
+  persistContent = () => {
+    clearTimeout(this.timer);
+
+    const timer = setTimeout(() => {
+      this.setState({ isWritting: false, showBadge: true });
+
+      const raw = convertToRaw(this.state.editorState.getCurrentContent());
+
+      storage.setItem("scratch-content", JSON.stringify(raw));
+
+      setTimeout(() => {
+        this.setState({ showBadge: false });
+      }, 1500);
+    }, 1500);
+
+    this.timer = timer;
+  };
+
+  // TODO: only handle non-visual (i.e. bold) commands
+  handleKeyCommand = command => {
+    const newState = RichUtils.handleKeyCommand(
+      this.state.editorState,
+      command
+    );
+
+    if (newState) {
+      this.onChange(newState);
+      return "handled";
+    }
+
+    return "not-handled";
+  };
+
+  render() {
+    const { showBadge, isOverALink, editorState } = this.state;
     return (
       <div>
-        <Textarea innerRef={this.bindTextarea} onChange={this.handleInput}>
-          {value}
+        <Textarea onClick={() => this.editor.focus()}>
+          <Editor
+            readOnly={isOverALink}
+            editorState={editorState}
+            onChange={this.onChange}
+            handleKeyCommand={this.handleKeyCommand}
+            ref={element => {
+              this.editor = element;
+            }}
+          />
         </Textarea>
         {showBadge && <Badge>Saved!</Badge>}
       </div>
-    )
+    );
   }
 }
+
+export default EditorWrapper;
