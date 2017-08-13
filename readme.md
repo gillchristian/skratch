@@ -1,3 +1,3 @@
-# scratch
+# skratch.
 
 > minimalistic notes app
