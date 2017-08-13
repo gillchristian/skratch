@@ -12,14 +12,14 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "react-scripts build && cp Caddyfile build/Caddyfile",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
     "format": "prettier --single-quote --trailing-comma all --no-semi --write \"src/**/*.js\"",
     "precommit": "lint-staged"
   },
   "lint-staged": {
-    "*.js": [
+    "src/**/*.js": [
       "prettier --write",
       "git add"
     ]
