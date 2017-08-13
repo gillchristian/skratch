@@ -1,6 +1,5 @@
 import React from "react";
 import styled from "styled-components";
-
 import {
   Editor,
   EditorState,
@@ -10,49 +9,13 @@ import {
   convertFromRaw
 } from "draft-js";
 
-import storage from "../services/storage";
-import withProps from "../hocs/withProps";
-import tryCatch from "../utils/tryCatch";
+import storage from "../../../services/storage";
+import withProps from "../../../hocs/withProps";
+import tryCatch from "../../../utils/tryCatch";
+import Link from "../../ui/Link";
 
-const Badge = styled.span`
-  color: black;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  padding: 5px;
-  background-color: rgba(0, 0, 0, 0.15);
-`;
-
-const Textarea = styled.div`
-  width: 100%;
-  height: 100vh;
-  margin: 0;
-  padding: 20px;
-  border: none;
-  color: white;
-  background-color: #356c5d;
-
-  &:focus {
-    outline: none;
-  }
-`;
-
-const EditorLink = styled.a.attrs({
-  // children gets passed an array of React components
-  // with one component containing the text
-  // which is the href of the link
-  href: p => p.children[0].props.text
-})`
-  color: inherit;
-  cursor: pointer;
-
-  &:hover,
-  &:link,
-  &:active,
-  &:visite {
-    color: inherit;
-  }
-`;
+import Textarea from "./Textarea";
+import Badge from "./Badge";
 
 // TODO: make this method more functional
 function findWithRegex(regex, contentBlock, callback) {
@@ -68,11 +31,16 @@ function findWithRegex(regex, contentBlock, callback) {
   }
 }
 
-// TODO: improve the link matching
-const rgx = /https?:\/\/\S+\.\S{2,}/g;
+// TODO: improve the link & email matching
+const linkRgx = /https?:\/\/\S+\.\S{2,}/g;
+const emailRgx = /\S+@\S+\.\S{2,}/g;
+
+function findEmailEntities(contentBlock, callback, contentState) {
+  findWithRegex(emailRgx, contentBlock, callback);
+}
 
 function findLinkEntities(contentBlock, callback, contentState) {
-  findWithRegex(rgx, contentBlock, callback);
+  findWithRegex(linkRgx, contentBlock, callback);
 }
 
 class EditorWrapper extends React.Component {
@@ -82,16 +50,32 @@ class EditorWrapper extends React.Component {
     this.disableEdit = this.disableEdit.bind(this);
     this.enableEdit = this.enableEdit.bind(this);
 
-    const decorator = new CompositeDecorator([
-      {
-        strategy: findLinkEntities,
-        component: withProps({
-          onMouseEnter: this.disableEdit,
-          onMouseLeave: this.enableEdit,
-          target: "_blank"
-        })(EditorLink)
-      }
-    ]);
+    const linkDecorator = {
+      strategy: findLinkEntities,
+      component: withProps(p => ({
+        onMouseEnter: this.disableEdit,
+        onMouseLeave: this.enableEdit,
+        target: "_blank",
+        // children gets passed an array of React components
+        // with one component containing the text
+        // which is the href of the link
+        href: p.children[0].props.text
+      }))(Link)
+    };
+
+    const emailDecorator = {
+      strategy: findEmailEntities,
+      component: withProps(p => ({
+        onMouseEnter: this.disableEdit,
+        onMouseLeave: this.enableEdit,
+        // children gets passed an array of React components
+        // with one component containing the text
+        // which is the href of the link
+        href: `mailto:${p.children[0].props.text}`
+      }))(Link)
+    };
+
+    const decorator = new CompositeDecorator([linkDecorator, emailDecorator]);
 
     const stored = storage.getItem("scratch-content");
     const raw = tryCatch(JSON.parse, () => false, stored);
