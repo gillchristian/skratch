@@ -12,6 +12,7 @@ import {
 
 import storage from "../services/storage";
 import withProps from "../hocs/withProps";
+import tryCatch from "../utils/tryCatch";
 
 const Badge = styled.span`
   color: black;
@@ -68,7 +69,7 @@ function findWithRegex(regex, contentBlock, callback) {
 }
 
 // TODO: improve the link matching
-const rgx = /https?:\/\/\S+/g;
+const rgx = /https?:\/\/\S+\.\S{2,}/g;
 
 function findLinkEntities(contentBlock, callback, contentState) {
   findWithRegex(rgx, contentBlock, callback);
@@ -93,7 +94,7 @@ class EditorWrapper extends React.Component {
     ]);
 
     const stored = storage.getItem("scratch-content");
-    const raw = stored && JSON.parse(stored);
+    const raw = tryCatch(JSON.parse, () => false, stored);
     const editorState = raw
       ? EditorState.createWithContent(convertFromRaw(raw), decorator)
       : EditorState.createEmpty(decorator);
