@@ -1,11 +1,10 @@
 import React from 'react'
-import styled from 'styled-components'
 
+import storage from './services/storage'
 import Editor from './components/Editor'
-import Modal from './components/Modal'
+import Modal from './components/ui/Modal'
+import Help from './components/Help'
 import Badge from './components/ui/Badge'
-import Link from './components/ui/Link'
-import Flex from './components/ui/Flex'
 
 const HelpBadge = Badge.extend`
   position: fixed;
@@ -13,71 +12,22 @@ const HelpBadge = Badge.extend`
   right: 0;
   cursor: pointer;
 `
-const ModalContent = styled.div`
-  color: #fff;
-  background: #e74c3c;
-  position: relative;
-  border-radius: 3px;
-  margin: 0 auto;
-`
-
-const Heading = styled.div`
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  background-color: rgba(0, 0, 0, 0.25);
-`
-
-const Body = styled.div`padding: 15px;`
-
-const Button = styled.button`
-  cursor: pointer;
-  border-radius: 3px;
-  padding: 5px 0;
-  margin: 5px 10px;
-  width: 150px;
-  background: transparent;
-  color: white;
-  border: 2px solid white;
-
-  &:hover {
-    background-color: rgba(0, 0, 0, 0.25);
-  }
-`
-
-const Help = () =>
-  <ModalContent>
-    <Heading>
-      <h2>skratch</h2>
-    </Heading>
-
-    <Body>
-      <p>
-        Skratch is a minimalistic notes app that aims to be as simple as
-        possible Just like taking a peace of paper, writting some notes and
-        throwing it away after you've used it but not hurting the trees.
-      </p>
-
-      <Flex justify="end">
-        <Button onClick={this.closeModal}>close</Button>
-      </Flex>
-    </Body>
-
-    <Heading>
-      <h4>
-        {'</> with <3'}{' '}
-        <Link to="https://gillchristian.xyz/about-me" blank>
-          gillchristian
-        </Link>
-      </h4>
-    </Heading>
-  </ModalContent>
 
 class App extends React.Component {
   state = {
     showModal: false,
+    greet: false,
+  }
+
+  componentDidMount() {
+    const greet = !(storage.getItem('skratch-should-greet') === 'false')
+
+    greet && storage.setItem('skratch-should-greet', false)
+
+    // show the modal 1s after the page loads
+    setTimeout(() => {
+      this.setState({ showModal: greet, greet })
+    }, 1000)
   }
 
   closeModal = () => this.setState({ showModal: false })
@@ -90,7 +40,7 @@ class App extends React.Component {
         <Editor />
 
         <Modal show={this.state.showModal} onClose={this.closeModal}>
-          <Help />
+          <Help close={this.closeModal} showGreet={this.state.greet} />
         </Modal>
 
         <HelpBadge onClick={this.openModal}>Help!</HelpBadge>

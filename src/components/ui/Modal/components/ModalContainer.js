@@ -3,8 +3,8 @@ import styled from 'styled-components'
 const ModalContainer = styled.div`
   position: fixed;
   top: 50%;
-
   left: 50%;
+
   width: 50%;
   max-width: 630px;
   min-width: 320px;
