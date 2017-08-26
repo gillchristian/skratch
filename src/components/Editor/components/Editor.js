@@ -2,18 +2,17 @@ import React from 'react'
 import {
   Editor,
   EditorState,
+  ContentState,
   RichUtils,
   CompositeDecorator,
-  convertToRaw,
-  convertFromRaw,
 } from 'draft-js'
 
 import storage from '../../../services/storage'
 import withProps from '../../../hocs/withProps'
-import tryCatch from '../../../utils/tryCatch'
 import Link from '../../ui/Link'
 
-import Textarea from './Textarea'
+import PersistContent from '../containers/PersistContent'
+import EditorBackground from './EditorBackground'
 import Badge from './Badge'
 
 // TODO: make this method more functional
@@ -76,17 +75,13 @@ class EditorWrapper extends React.Component {
 
     const decorator = new CompositeDecorator([linkDecorator, emailDecorator])
 
-    const stored = storage.getItem('scratch-content')
-    const raw = tryCatch(JSON.parse, () => false, stored)
-    const editorState = raw
-      ? EditorState.createWithContent(convertFromRaw(raw), decorator)
-      : EditorState.createEmpty(decorator)
+    const text = storage.getItem('scratch-content') || ''
+    const contet = ContentState.createFromText(text)
+    const editorState = EditorState.createWithContent(contet, decorator)
 
     this.state = {
       editorState,
       isOverALink: false,
-      isWritting: false,
-      showBadge: false,
     }
   }
 
@@ -103,29 +98,12 @@ class EditorWrapper extends React.Component {
     setTimeout(() => this.editor.focus(), 0)
   }
 
-  onChange = editorState => {
-    this.setState({ editorState, isWritting: true })
-    this.persistContent()
+  onChange = persistContent => editorState => {
+    this.setState({ editorState })
+    persistContent()
   }
 
-  // saves the content to localStorage everytime the user stops typing for 500ms
-  persistContent = () => {
-    clearTimeout(this.timer)
-
-    const timer = setTimeout(() => {
-      this.setState({ isWritting: false, showBadge: true })
-
-      const raw = convertToRaw(this.state.editorState.getCurrentContent())
-
-      storage.setItem('scratch-content', JSON.stringify(raw))
-
-      setTimeout(() => {
-        this.setState({ showBadge: false })
-      }, 1500)
-    }, 500)
-
-    this.timer = timer
-  }
+  getContent = () => this.state.editorState.getCurrentContent().getPlainText()
 
   // TODO: only handle non-visual (i.e. bold) commands
   handleKeyCommand = command => {
@@ -140,22 +118,25 @@ class EditorWrapper extends React.Component {
   }
 
   render() {
-    const { showBadge, isOverALink, editorState } = this.state
+    const { isOverALink, editorState } = this.state
     return (
-      <div>
-        <Textarea onClick={() => this.editor.focus()}>
-          <Editor
-            readOnly={isOverALink}
-            editorState={editorState}
-            onChange={this.onChange}
-            handleKeyCommand={this.handleKeyCommand}
-            ref={element => {
-              this.editor = element
-            }}
-          />
-        </Textarea>
-        {showBadge && <Badge>Saved!</Badge>}
-      </div>
+      <PersistContent name="scratch-content" getContent={this.getContent}>
+        {({ justSaved, persistContent }) =>
+          <div>
+            <EditorBackground onClick={() => this.editor.focus()}>
+              <Editor
+                readOnly={isOverALink}
+                editorState={editorState}
+                onChange={this.onChange(persistContent)}
+                handleKeyCommand={this.handleKeyCommand}
+                ref={element => {
+                  this.editor = element
+                }}
+              />
+            </EditorBackground>
+            {justSaved && <Badge>Saved!</Badge>}
+          </div>}
+      </PersistContent>
     )
   }
 }
