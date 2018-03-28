@@ -5,6 +5,8 @@ import {
   ContentState,
   RichUtils,
   CompositeDecorator,
+  getDefaultKeyBinding,
+  KeyBindingUtil,
 } from 'draft-js'
 
 import storage from '../../../services/storage'
@@ -106,22 +108,56 @@ class EditorWrapper extends React.Component {
   getContent = () => this.state.editorState.getCurrentContent().getPlainText()
 
   // TODO: only handle non-visual (i.e. bold) commands
-  handleKeyCommand = command => {
-    const newState = RichUtils.handleKeyCommand(this.state.editorState, command)
+  handleKeyCommand = (command, editorState) => {
+    const newState = RichUtils.handleKeyCommand(editorState, command)
+
+    console.log({ command })
 
     if (newState) {
-      this.onChange(newState)
-      return 'handled'
+      switch (command) {
+        case 'move-up':
+        case 'move-down':
+          return 'handled'
+        default:
+          this.onChange(newState)
+          return 'handled'
+      }
     }
 
     return 'not-handled'
+  }
+
+  keyBindingFn = e => {
+    console.log({ keyCode: e.keyCode, key: e.key })
+
+    // arrow left  -> 37
+    if (e.keyCode === 37 && (e.ctrlKey || e.cmdKey) && !e.altKey) {
+      return 'arrow-left'
+    }
+
+    // arrow up    -> 38
+    if (e.keyCode === 38 && (e.ctrlKey || e.cmdKey) && !e.altKey) {
+      return 'move-up'
+    }
+
+    // arrow right -> 39
+    if (e.keyCode === 39 && (e.ctrlKey || e.cmdKey) && !e.altKey) {
+      return 'arrow-right'
+    }
+
+    // arrow down  -> 40
+    if (e.keyCode === 40 && (e.ctrlKey || e.cmdKey) && !e.altKey) {
+      return 'move-down'
+    }
+
+    return getDefaultKeyBinding(e)
   }
 
   render() {
     const { isOverALink, editorState } = this.state
     return (
       <PersistContent name="scratch-content" getContent={this.getContent}>
-        {({ justSaved, persistContent }) =>
+        {({ justSaved, persistContent }) => (
           <div>
             <EditorBackground onClick={() => this.editor.focus()}>
               <Editor
@@ -129,13 +165,15 @@ class EditorWrapper extends React.Component {
                 editorState={editorState}
                 onChange={this.onChange(persistContent)}
                 handleKeyCommand={this.handleKeyCommand}
+                keyBindingFn={this.keyBindingFn}
                 ref={element => {
                   this.editor = element
                 }}
               />
             </EditorBackground>
             {justSaved && <Badge>Saved!</Badge>}
-          </div>}
+          </div>
+        )}
       </PersistContent>
     )
   }
