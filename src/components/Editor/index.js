@@ -1,3 +1,1 @@
-import Editor from './containers/Editor'
-
-export default Editor
+export { default } from './containers/Editor'

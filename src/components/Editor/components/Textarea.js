@@ -41,7 +41,7 @@ class EditorWrapper extends React.Component {
 
     return (
       <PersistContent name="scratch-content" getContent={this.getContent}>
-        {({ justSaved, persistContent }) =>
+        {({ justSaved, persistContent }) => (
           <div onClick={() => this.editor.focus()}>
             <Textarea
               onChange={this.onChange(persistContent)}
@@ -52,7 +52,8 @@ class EditorWrapper extends React.Component {
               {text}
             </Textarea>
             {justSaved && <Badge>Saved!</Badge>}
-          </div>}
+          </div>
+        )}
       </PersistContent>
     )
   }

@@ -34,7 +34,7 @@ const Bigger = styled.span`
 
 const icons = '❤🌴🌲🌳❤'
 
-const Content = ({ close, showGreet }) =>
+const Content = ({ close, showGreet }) => (
   <Container>
     <Heading>
       {showGreet && <h2>Welcome to skratch!</h2>}
@@ -72,5 +72,6 @@ const Content = ({ close, showGreet }) =>
       </h4>
     </Heading>
   </Container>
+)
 
 export default Content
